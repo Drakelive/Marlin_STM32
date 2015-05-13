@@ -147,7 +147,7 @@ const uint16_t speed_lookuptable_slow[256][2] PROGMEM = {
    {1235, 5}, {1230, 5}, {1225, 5}, {1220, 5}, {1215, 4}, {1211, 5}, {1206, 5}, {1201, 5},
 };
 
-#else //for STduino
+#else //for STduino and CZminiF103
 
 const uint16_t speed_lookuptable_fast[256][2] PROGMEM = {\
 { 62500, 55556}, { 6944, 3268}, { 3676, 1176}, { 2500, 607}, { 1893, 369}, { 1524, 249}, { 1275, 179}, { 1096, 135}, 
