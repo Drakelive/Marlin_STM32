@@ -48,6 +48,7 @@
 #define BOARD_LEAPFROG          999  // Leapfrog
 
 #define BOARD_STduino          1000  // STduino
+#define BOARD_CZminiF103       1010  // Drake CZminiF103
 
 #define BOARD_99                99   // This is in pins.h but...?
 
