@@ -3,8 +3,14 @@
 
 #ifndef MARLIN_H
 #define MARLIN_H
+#define ARDUINO_ARCH_STM32
+
 
 #define  FORCE_INLINE __attribute__((always_inline)) inline
+/**
+ * Compiler warning on unused varable.
+ */
+#define UNUSED(x) (void) (x)
 
 #include <math.h>
 #include <stdio.h>
@@ -13,12 +19,44 @@
 #include <inttypes.h>
 #include <avr/pgmspace.h>
 
-#ifndef ARDUINO_ARCH_STM32
-  #include <util/delay.h>
-  #include <avr/eeprom.h>
-  #include <avr/interrupt.h>
-#endif
 
+#ifdef ARDUINO_ARCH_STM32
+
+     #define PROGMEM
+     #define PSTR(STR) STR
+
+     typedef struct {
+                      TIM_TypeDef *Timer;
+                    } Timer;
+
+     const Timer Timers[NUM_TIMERS] = {
+			// ((TIM_TypeDef *) TIM2_BASE),
+			{TIM1},
+			{TIM2},
+			{TIM3},
+			{TIM4},
+			{TIM5},
+			{TIM6},
+			{TIM7},
+			{TIM8},
+	 };	 
+	 
+     #define TIM4                ((TIM_TypeDef *) TIM4_BASE)
+	 
+	 
+ #else // !ARDUINO_ARCH_STM32
+     #include <util/delay.h>
+	 #include <avr/eeprom.h>
+	 #include <avr/interrupt.h>
+#endif
+ 
+/* 
+	#ifndef ARDUINO_ARCH_STM32
+	  #include <util/delay.h>
+	  #include <avr/eeprom.h>
+	  #include <avr/interrupt.h>
+	#endif
+*/
 
 #include "fastio.h"
 #include "Configuration.h"
@@ -29,12 +67,19 @@
 #endif
 
 #if (ARDUINO >= 100)
-# include "Arduino.h"
+    #include "Arduino.h"
 #else
-# include "WProgram.h"
-  //Arduino < 1.0.0 does not define this, so we need to do it ourselves
-# define analogInputToDigitalPin(p) ((p) + A0)
+    #include "WProgram.h"
+    //Arduino < 1.0.0 does not define this, so we need to do it ourselves
+// Drake --->    #define analogInputToDigitalPin(p) ((p) + A0)
 #endif
+
+// Arduino < 1.0.0 does not define this, so we need to do it ourselves
+#ifndef analogInputToDigitalPin
+  #define analogInputToDigitalPin(p) ((p) + 0xA0)
+#endif
+
+
 
 #ifdef AT90USB || ARDUINO_ARCH_STM32
 #include "HardwareSerial.h"
@@ -43,10 +88,10 @@
 #include "MarlinSerial.h"
 
 #ifndef cbi
-#define cbi(sfr, bit) (_SFR_BYTE(sfr) &= ~_BV(bit))
+  #define cbi(sfr, bit) (_SFR_BYTE(sfr) &= ~_BV(bit))
 #endif
 #ifndef sbi
-#define sbi(sfr, bit) (_SFR_BYTE(sfr) |= _BV(bit))
+  #define sbi(sfr, bit) (_SFR_BYTE(sfr) |= _BV(bit))
 #endif
 
 #include "WString.h"
@@ -80,6 +125,7 @@
 
 const char errormagic[] PROGMEM ="Error:";
 const char echomagic[] PROGMEM ="echo:";
+
 #define SERIAL_ERROR_START (serialprintPGM(errormagic))
 #define SERIAL_ERROR(x) SERIAL_PROTOCOL(x)
 #define SERIAL_ERRORPGM(x) SERIAL_PROTOCOLPGM(x)
